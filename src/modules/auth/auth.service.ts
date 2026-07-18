@@ -43,9 +43,9 @@ const loginUser = async (payload : ILoginUser) => {
         where : {email}
     })
 
-    // if (user.activeStatus === "BLOCKED") {
-    //     throw new Error("Your account has been blocked. Please contact support.");
-    // }
+    if (user.status === "SUSPENDED") {
+        throw new Error("Your account has been blocked. Please contact support.");
+    }
 
     const isPasswordMatched = await bcrypt.compare(password, user.password);
     if(!isPasswordMatched){
@@ -79,8 +79,20 @@ const loginUser = async (payload : ILoginUser) => {
     };
 }
 
+const getMyProfileFromDB = async (userId : string) => {
+    console.log(userId)
+    const user = await prisma.user.findUniqueOrThrow({
+        where : {id : userId},
+        omit : {
+            password : true
+        }
+    });
+
+    return user;
+}
 
 export const authService = {
     registerUserIntDB,
-    loginUser
+    loginUser,
+    getMyProfileFromDB
 }

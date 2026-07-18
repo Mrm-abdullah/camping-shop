@@ -3,11 +3,12 @@ import { catchAsync } from "../../utils/catchAsync";
 import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { authService } from "./auth.service";
+import { jwtUtils } from "../../utils/jwt";
+import config from "../../config";
 
 const registerUser = catchAsync(async (req : Request, res : Response) => {
     const payload = req.body;
     const user = await authService.registerUserIntDB(payload);
-
     sendResponse(res, {
         success : true,
         statusCode : httpStatus.CREATED,
@@ -43,7 +44,20 @@ const loginUser = catchAsync(async (req : Request, res : Response, next: NextFun
 
 })
 
+const getMyProfile = catchAsync( async (req: Request, res: Response, next: NextFunction) => {
+    
+    const profile = await authService.getMyProfileFromDB(req.user?.id as string);
+    
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User profile fetched successfully",
+        data: { profile }
+    })
+})
+
 export const authController = {
     registerUser,
-    loginUser
+    loginUser,
+    getMyProfile
 }
