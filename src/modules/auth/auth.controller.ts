@@ -4,6 +4,18 @@ import { sendResponse } from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import { authService } from "./auth.service";
 
+const registerUser = catchAsync(async (req : Request, res : Response) => {
+    const payload = req.body;
+    const user = await authService.registerUserIntDB(payload);
+
+    sendResponse(res, {
+        success : true,
+        statusCode : httpStatus.CREATED,
+        message : "User registration successful",
+        data : { user }
+    }); 
+})
+
 const loginUser = catchAsync(async (req : Request, res : Response, next: NextFunction ) => {
     const payload = req.body;
     const {accessToken, refreshToken } = await authService.loginUser(payload);
@@ -32,5 +44,6 @@ const loginUser = catchAsync(async (req : Request, res : Response, next: NextFun
 })
 
 export const authController = {
+    registerUser,
     loginUser
 }
